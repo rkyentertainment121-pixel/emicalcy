@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
-  Home, Car, User, Percent, CalendarClock, DollarSign, Wallet, Bot, TrendingUp, Sparkles, ReceiptText, Calculator
+  Home, Car, User, Percent, CalendarClock, IndianRupee, Wallet, Bot, TrendingUp, Sparkles, ReceiptText, Calculator
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -82,11 +82,11 @@ export function LoanCalculator() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      loanAmount: 100000,
-      interestRate: 5,
-      tenure: 10,
+      loanAmount: 1000000,
+      interestRate: 8.5,
+      tenure: 20,
       loanType: "home",
-      processingFee: 1000,
+      processingFee: 10000,
       lumpSumAmount: 0,
       extraMonthlyPayment: 0,
     },
@@ -200,7 +200,7 @@ export function LoanCalculator() {
     setTimeout(() => {
       // Placeholder for AI logic
       const values = form.getValues();
-      const suggestion = `Based on your ${formatNumber(values.interestRate)}% interest rate and financial goals, an aggressive prepayment strategy could be beneficial. Consider increasing your extra monthly payment to ${formatNumber((values.extraMonthlyPayment || 0) + 200, {style: 'currency', currency: 'USD'})}. This could reduce your loan tenure by an additional ${Math.floor(Math.random() * 12) + 6} months, saving you more in interest. For a personalized plan, analyzing your full financial portfolio is recommended.`;
+      const suggestion = `Based on your ${formatNumber(values.interestRate)}% interest rate and financial goals, an aggressive prepayment strategy could be beneficial. Consider increasing your extra monthly payment to ${formatNumber((values.extraMonthlyPayment || 0) + 5000, {style: 'currency', currency: 'INR'})}. This could reduce your loan tenure by an additional ${Math.floor(Math.random() * 12) + 6} months, saving you more in interest. For a personalized plan, analyzing your full financial portfolio is recommended.`;
       setAiSuggestion(suggestion);
       setIsGeneratingAi(false);
     }, 2000);
@@ -231,9 +231,9 @@ export function LoanCalculator() {
                   name="loanAmount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center gap-2"><DollarSign className="h-4 w-4"/>Loan Amount</FormLabel>
+                      <FormLabel className="flex items-center gap-2"><IndianRupee className="h-4 w-4"/>Loan Amount</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., 100000" {...field} type="number" />
+                        <Input placeholder="e.g., 1000000" {...field} type="number" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -246,7 +246,7 @@ export function LoanCalculator() {
                     <FormItem>
                       <FormLabel className="flex items-center gap-2"><Percent className="h-4 w-4"/>Annual Interest Rate (%)</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., 5" {...field} type="number" step="0.01" />
+                        <Input placeholder="e.g., 8.5" {...field} type="number" step="0.01" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -259,7 +259,7 @@ export function LoanCalculator() {
                     <FormItem>
                       <FormLabel className="flex items-center gap-2"><CalendarClock className="h-4 w-4"/>Loan Tenure (Years)</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., 10" {...field} type="number" />
+                        <Input placeholder="e.g., 20" {...field} type="number" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -297,7 +297,7 @@ export function LoanCalculator() {
                     <FormItem>
                       <FormLabel className="flex items-center gap-2"><Wallet className="h-4 w-4"/>Processing Fee (Optional)</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., 1000" {...field} type="number" />
+                        <Input placeholder="e.g., 10000" {...field} type="number" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -315,7 +315,7 @@ export function LoanCalculator() {
                         <FormItem>
                           <FormLabel>Lump Sum Amount</FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g., 10000" {...field} type="number" />
+                            <Input placeholder="e.g., 100000" {...field} type="number" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -341,7 +341,7 @@ export function LoanCalculator() {
                         <FormItem>
                           <FormLabel>Extra Monthly Payment</FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g., 100" {...field} type="number" />
+                            <Input placeholder="e.g., 5000" {...field} type="number" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -376,7 +376,7 @@ export function LoanCalculator() {
                   <CardTitle className="text-lg">Monthly Payment (EMI)</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-bold text-primary">{formatNumber(summary.emi, { style: 'currency', currency: 'USD' })}</p>
+                  <p className="text-3xl font-bold text-primary">{formatNumber(summary.emi, { style: 'currency', currency: 'INR' })}</p>
                 </CardContent>
               </Card>
               <Card>
@@ -384,7 +384,7 @@ export function LoanCalculator() {
                   <CardTitle className="text-lg">Total Interest</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-bold">{formatNumber(summary.totalInterest, { style: 'currency', currency: 'USD' })}</p>
+                  <p className="text-3xl font-bold">{formatNumber(summary.totalInterest, { style: 'currency', currency: 'INR' })}</p>
                 </CardContent>
               </Card>
               <Card>
@@ -392,7 +392,7 @@ export function LoanCalculator() {
                   <CardTitle className="text-lg">Total Payment</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-bold">{formatNumber(summary.totalPaidWithPrepayment, { style: 'currency', currency: 'USD' })}</p>
+                  <p className="text-3xl font-bold">{formatNumber(summary.totalPaidWithPrepayment, { style: 'currency', currency: 'INR' })}</p>
                 </CardContent>
               </Card>
               <Card>
@@ -409,7 +409,7 @@ export function LoanCalculator() {
                   <CardTitle className="text-lg">Interest Saved</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-bold text-green-600">{formatNumber(summary.interestSaved, { style: 'currency', currency: 'USD' })}</p>
+                  <p className="text-3xl font-bold text-green-600">{formatNumber(summary.interestSaved, { style: 'currency', currency: 'INR' })}</p>
                 </CardContent>
               </Card>
               <Card>
@@ -446,10 +446,10 @@ export function LoanCalculator() {
                       {amortizationData.map((row) => (
                         <TableRow key={row.month}>
                           <TableCell className="font-medium">{row.month}</TableCell>
-                          <TableCell>{formatNumber(row.payment, { style: 'currency', currency: 'USD' })}</TableCell>
-                          <TableCell>{formatNumber(row.principal, { style: 'currency', currency: 'USD' })}</TableCell>
-                          <TableCell>{formatNumber(row.interest, { style: 'currency', currency: 'USD' })}</TableCell>
-                          <TableCell className="text-right">{formatNumber(row.remainingBalance, { style: 'currency', currency: 'USD' })}</TableCell>
+                          <TableCell>{formatNumber(row.payment, { style: 'currency', currency: 'INR' })}</TableCell>
+                          <TableCell>{formatNumber(row.principal, { style: 'currency', currency: 'INR' })}</TableCell>
+                          <TableCell>{formatNumber(row.interest, { style: 'currency', currency: 'INR' })}</TableCell>
+                          <TableCell className="text-right">{formatNumber(row.remainingBalance, { style: 'currency', currency: 'INR' })}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -493,3 +493,5 @@ export function LoanCalculator() {
     </div>
   );
 }
+
+    

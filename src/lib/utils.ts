@@ -15,5 +15,7 @@ export function formatNumber(
     ...options,
   };
   
-  return new Intl.NumberFormat("en-US", defaultOptions).format(value);
+  return new Intl.NumberFormat("en-IN", defaultOptions).format(value);
 }
+
+    
