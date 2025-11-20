@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'LoanWise Analyzer',
+  title: 'Kenz Tech Analyzer',
   description: 'An all-in-one calculator for smart loan management and prepayment strategies.',
 };
 
