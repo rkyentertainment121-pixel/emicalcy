@@ -5,7 +5,7 @@ import { useState } from "react";
 import { LoanCalculator } from "@/components/loan-calculator";
 import { CompoundInterestCalculator } from "@/components/compound-interest-calculator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PiggyBank, Landmark, Percent, CircleDollarSign } from "lucide-react";
+import { Banknote, Landmark, Percent, CircleDollarSign } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -22,7 +22,7 @@ export default function Home() {
       <div className="container mx-auto px-4 py-8 md:py-12">
         <header className="text-center mb-8 md:mb-12">
           <div className="inline-flex items-center justify-center bg-primary/20 text-primary p-3 rounded-full mb-4">
-             <PiggyBank className="h-8 w-8" />
+             <Banknote className="h-8 w-8" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
             Kenz EMI Calculator
