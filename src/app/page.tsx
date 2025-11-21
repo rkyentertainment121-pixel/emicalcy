@@ -1,5 +1,8 @@
+
 import { LoanCalculator } from "@/components/loan-calculator";
-import { PiggyBank } from "lucide-react";
+import { CompoundInterestCalculator } from "@/components/compound-interest-calculator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PiggyBank, Landmark, Percent } from "lucide-react";
 
 export default function Home() {
   return (
@@ -13,10 +16,28 @@ export default function Home() {
             Kenz EMI Calculator
           </h1>
           <p className="mt-3 text-lg text-muted-foreground max-w-2xl mx-auto">
-            Your all-in-one calculator for smart loan management. Make informed decisions about your loans and prepayments.
+            Your all-in-one suite for smart financial planning. Make informed decisions about your loans, investments, and savings.
           </p>
         </header>
-        <LoanCalculator />
+        
+        <Tabs defaultValue="emi-calculator" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 max-w-lg mx-auto">
+            <TabsTrigger value="emi-calculator">
+              <Landmark className="mr-2 h-4 w-4"/>
+              EMI Calculator
+            </TabsTrigger>
+            <TabsTrigger value="compound-interest-calculator">
+              <Percent className="mr-2 h-4 w-4"/>
+              Compound Interest
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="emi-calculator" className="mt-6">
+            <LoanCalculator />
+          </TabsContent>
+          <TabsContent value="compound-interest-calculator" className="mt-6">
+            <CompoundInterestCalculator />
+          </TabsContent>
+        </Tabs>
       </div>
     </main>
   );

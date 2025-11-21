@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -34,6 +34,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatNumber } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getPrepaymentSuggestions, PrepaymentSuggestionsInput, PrepaymentSuggestionsOutput } from "@/ai/ai-prepayment-suggestions";
+import { useToast } from "@/hooks/use-toast";
 
 
 const formSchema = z.object({
@@ -45,6 +47,8 @@ const formSchema = z.object({
   lumpSumAmount: z.coerce.number().min(0).default(0),
   lumpSumMonth: z.coerce.number().min(1).int().optional(),
   extraMonthlyPayment: z.coerce.number().min(0).default(0),
+  financialGoals: z.string().default("Pay off loan quickly"),
+  riskTolerance: z.string().default("Moderate"),
 }).refine(data => {
   if (data.lumpSumAmount > 0) {
     return data.lumpSumMonth !== undefined && data.lumpSumMonth > 0;
@@ -76,8 +80,9 @@ type SummaryData = {
 export function LoanCalculator() {
   const [amortizationData, setAmortizationData] = useState<AmortizationData[] | null>(null);
   const [summary, setSummary] = useState<SummaryData | null>(null);
-  const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
+  const [aiSuggestion, setAiSuggestion] = useState<PrepaymentSuggestionsOutput | null>(null);
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -89,10 +94,20 @@ export function LoanCalculator() {
       processingFee: 10000,
       lumpSumAmount: 0,
       extraMonthlyPayment: 0,
+      financialGoals: "Pay off loan quickly",
+      riskTolerance: "Moderate",
     },
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
+    calculate(values);
+  };
+  
+  useEffect(() => {
+    calculate(form.getValues());
+  }, []);
+
+  const calculate = (values: z.infer<typeof formSchema>) => {
     const principal = values.loanAmount + (values.processingFee || 0);
     const monthlyRate = values.interestRate / 12 / 100;
     const numberOfMonths = values.tenure * 12;
@@ -192,18 +207,33 @@ export function LoanCalculator() {
       interestSaved: originalTotalInterest - totalInterestPaid,
       totalPaidWithPrepayment,
     });
-  };
+  }
 
-  const handleAiSuggestion = () => {
+  const handleAiSuggestion = async () => {
     setIsGeneratingAi(true);
     setAiSuggestion(null);
-    setTimeout(() => {
-      // Placeholder for AI logic
+    try {
       const values = form.getValues();
-      const suggestion = `Based on your ${formatNumber(values.interestRate)}% interest rate and financial goals, an aggressive prepayment strategy could be beneficial. Consider increasing your extra monthly payment to ${formatNumber((values.extraMonthlyPayment || 0) + 5000, {style: 'currency', currency: 'INR'})}. This could reduce your loan tenure by an additional ${Math.floor(Math.random() * 12) + 6} months, saving you more in interest. For a personalized plan, analyzing your full financial portfolio is recommended.`;
+      const input: PrepaymentSuggestionsInput = {
+        loanAmount: values.loanAmount,
+        interestRate: values.interestRate / 100,
+        loanTenureMonths: values.tenure * 12,
+        monthlyPayment: summary?.emi || 0,
+        financialGoals: values.financialGoals,
+        riskTolerance: values.riskTolerance,
+      };
+      const suggestion = await getPrepaymentSuggestions(input);
       setAiSuggestion(suggestion);
+    } catch (error) {
+      console.error("Error getting AI suggestion:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to get AI suggestion. Please try again.",
+      });
+    } finally {
       setIsGeneratingAi(false);
-    }, 2000);
+    }
   };
   
   const loanTypeIcons = {
@@ -233,7 +263,7 @@ export function LoanCalculator() {
                     <FormItem>
                       <FormLabel className="flex items-center gap-2"><IndianRupee className="h-4 w-4"/>Loan Amount</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., 1000000" {...field} type="number" />
+                        <Input placeholder="e.g., 1,000,000" {...field} type="number" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -297,7 +327,7 @@ export function LoanCalculator() {
                     <FormItem>
                       <FormLabel className="flex items-center gap-2"><Wallet className="h-4 w-4"/>Processing Fee (Optional)</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., 10000" {...field} type="number" />
+                        <Input placeholder="e.g., 10,000" {...field} type="number" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -315,7 +345,7 @@ export function LoanCalculator() {
                         <FormItem>
                           <FormLabel>Lump Sum Amount</FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g., 100000" {...field} type="number" />
+                            <Input placeholder="e.g., 100,000" {...field} type="number" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -341,7 +371,7 @@ export function LoanCalculator() {
                         <FormItem>
                           <FormLabel>Extra Monthly Payment</FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g., 5000" {...field} type="number" />
+                            <Input placeholder="e.g., 5,000" {...field} type="number" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -362,7 +392,7 @@ export function LoanCalculator() {
       </Card>
 
       {summary && amortizationData && (
-        <Tabs defaultValue="summary" className="w-full">
+        <Tabs defaultValue="summary" className="w-full mt-8">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="summary"><ReceiptText className="mr-2 h-4 w-4"/>Summary</TabsTrigger>
             <TabsTrigger value="schedule"><CalendarClock className="mr-2 h-4 w-4"/>Amortization Schedule</TabsTrigger>
@@ -463,10 +493,55 @@ export function LoanCalculator() {
             <Card className="bg-accent/20 border-accent">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><Bot className="h-6 w-6 text-accent-foreground" />AI Prepayment Advisor</CardTitle>
-                    <CardDescription>Get AI-powered suggestions for optimal prepayment strategies.</CardDescription>
+                    <CardDescription>Get AI-powered suggestions for optimal prepayment strategies based on your financial goals and risk tolerance.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <Button onClick={handleAiSuggestion} disabled={isGeneratingAi} className="bg-accent text-accent-foreground hover:bg-accent/90">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="financialGoals"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Financial Goal</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a goal" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="Pay off loan quickly">Pay off loan quickly</SelectItem>
+                              <SelectItem value="Minimize total interest paid">Minimize total interest paid</SelectItem>
+                              <SelectItem value="Keep monthly payments low">Keep monthly payments low</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="riskTolerance"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Risk Tolerance</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select risk tolerance" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="Conservative">Conservative</SelectItem>
+                              <SelectItem value="Moderate">Moderate</SelectItem>
+                              <SelectItem value="Aggressive">Aggressive</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                    <Button onClick={handleAiSuggestion} disabled={isGeneratingAi || !summary} className="bg-accent text-accent-foreground hover:bg-accent/90">
+                        <Sparkles className="mr-2 h-4 w-4" />
                         {isGeneratingAi ? 'Analyzing...' : 'Get AI Suggestions'}
                     </Button>
                     {isGeneratingAi && (
@@ -480,8 +555,13 @@ export function LoanCalculator() {
                          <Alert className="bg-background">
                             <Sparkles className="h-4 w-4" />
                             <AlertTitle>Recommendation</AlertTitle>
-                            <AlertDescription>
-                                {aiSuggestion}
+                            <AlertDescription className="space-y-2">
+                               <p className="font-semibold">{aiSuggestion.suggestedStrategy}</p>
+                               <p>{aiSuggestion.reasoning}</p>
+                               <div className="flex justify-between text-sm mt-2 pt-2 border-t">
+                                <span>Interest Saved: <span className="font-bold text-green-600">{formatNumber(aiSuggestion.estimatedInterestSavings, {style: 'currency', currency: 'INR'})}</span></span>
+                                <span>Tenure Reduction: <span className="font-bold text-green-600">{aiSuggestion.estimatedTenureReductionMonths} months</span></span>
+                               </div>
                             </AlertDescription>
                         </Alert>
                     )}
@@ -493,5 +573,3 @@ export function LoanCalculator() {
     </div>
   );
 }
-
-    
