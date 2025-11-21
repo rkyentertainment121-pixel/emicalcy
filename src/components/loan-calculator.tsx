@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
-  Home, Car, User, Percent, CalendarClock, IndianRupee, Wallet, Bot, TrendingUp, Sparkles, ReceiptText, Calculator
+  Home, Car, User, Percent, CalendarClock, Wallet, Bot, TrendingUp, Sparkles, ReceiptText, Calculator
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -79,6 +79,12 @@ type SummaryData = {
 
 type LoanCalculatorProps = {
   currency: string;
+};
+
+const currencySymbols: { [key: string]: string } = {
+    INR: '₹',
+    USD: '$',
+    EUR: '€',
 };
 
 export function LoanCalculator({ currency }: LoanCalculatorProps) {
@@ -246,7 +252,7 @@ export function LoanCalculator({ currency }: LoanCalculatorProps) {
     personal: <User className="h-4 w-4" />,
   };
 
-  const CurrencyIcon = currency === 'INR' ? IndianRupee : 'span';
+  const currencySymbol = currencySymbols[currency] || '$';
 
 
   return (
@@ -268,7 +274,7 @@ export function LoanCalculator({ currency }: LoanCalculatorProps) {
                   name="loanAmount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center gap-2"><CurrencyIcon className="h-4 w-4"/>Loan Amount</FormLabel>
+                      <FormLabel className="flex items-center gap-2"><span className="text-muted-foreground">{currencySymbol}</span>Loan Amount</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g., 1,000,000" {...field} type="number" />
                       </FormControl>

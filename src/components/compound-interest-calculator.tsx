@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { IndianRupee, Percent, CalendarClock, Bot, Calculator, BarChart, TrendingUp, Wallet } from "lucide-react";
+import { Percent, CalendarClock, Bot, Calculator, BarChart, TrendingUp, Wallet } from "lucide-react";
 import { Bar, BarChart as RechartsBarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from "recharts";
 
 import { Button } from "@/components/ui/button";
@@ -63,6 +63,12 @@ const chartConfig = {
 
 type CompoundInterestCalculatorProps = {
   currency: string;
+};
+
+const currencySymbols: { [key: string]: string } = {
+    INR: '₹',
+    USD: '$',
+    EUR: '€',
 };
 
 export function CompoundInterestCalculator({ currency }: CompoundInterestCalculatorProps) {
@@ -129,7 +135,7 @@ export function CompoundInterestCalculator({ currency }: CompoundInterestCalcula
     });
   };
 
-  const CurrencyIcon = currency === 'INR' ? IndianRupee : 'span';
+  const currencySymbol = currencySymbols[currency] || '$';
 
   return (
     <div className="space-y-8">
@@ -150,7 +156,7 @@ export function CompoundInterestCalculator({ currency }: CompoundInterestCalcula
                   name="principal"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center gap-2"><CurrencyIcon className="h-4 w-4"/>Principal Amount</FormLabel>
+                      <FormLabel className="flex items-center gap-2"><span className="text-muted-foreground">{currencySymbol}</span>Principal Amount</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g., 100,000" {...field} type="number" />
                       </FormControl>
