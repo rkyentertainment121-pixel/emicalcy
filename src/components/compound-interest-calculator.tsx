@@ -77,6 +77,9 @@ export function CompoundInterestCalculator({ currency }: CompoundInterestCalcula
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      principal: "" as any,
+      rate: "" as any,
+      tenure: "" as any,
       compoundingFrequency: 1,
       monthlyContribution: 0,
     },
@@ -312,3 +315,5 @@ export function CompoundInterestCalculator({ currency }: CompoundInterestCalcula
     </div>
   );
 }
+
+    

@@ -97,6 +97,9 @@ export function LoanCalculator({ currency }: LoanCalculatorProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      loanAmount: "" as any,
+      interestRate: "" as any,
+      tenure: "" as any,
       loanType: "home",
       processingFee: 0,
       lumpSumAmount: 0,
@@ -256,7 +259,6 @@ export function LoanCalculator({ currency }: LoanCalculatorProps) {
   };
 
   const currencySymbol = currencySymbols[currency] || '$';
-
 
   return (
     <div className="space-y-8">
@@ -601,3 +603,5 @@ export function LoanCalculator({ currency }: LoanCalculatorProps) {
     </div>
   );
 }
+
+    
