@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Kenz Tech Analyzer',
+  title: 'Kenz EMI Calculator',
   description: 'An all-in-one calculator for smart loan management and prepayment strategies.',
 };
 

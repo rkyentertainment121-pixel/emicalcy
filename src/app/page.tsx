@@ -10,7 +10,7 @@ export default function Home() {
              <PiggyBank className="h-8 w-8" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-            Kenz Tech Analyzer
+            Kenz EMI Calculator
           </h1>
           <p className="mt-3 text-lg text-muted-foreground max-w-2xl mx-auto">
             Your all-in-one calculator for smart loan management. Make informed decisions about your loans and prepayments.
