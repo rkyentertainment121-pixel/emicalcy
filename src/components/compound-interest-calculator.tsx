@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatNumber } from "@/lib/utils";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { ChartConfig, ChartContainer, ChartTooltipContent, ChartTooltip } from "@/components/ui/chart"
 
 const formSchema = z.object({
   principal: z.coerce.number({invalid_type_error: "Please enter a number."}).positive("Principal must be positive"),
@@ -61,7 +61,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function CompoundInterestCalculator() {
+type CompoundInterestCalculatorProps = {
+  currency: string;
+};
+
+export function CompoundInterestCalculator({ currency }: CompoundInterestCalculatorProps) {
   const [result, setResult] = useState<CalculationResult | null>(null);
 
   const form = useForm<FormData>({
@@ -81,7 +85,7 @@ export function CompoundInterestCalculator() {
   
   useEffect(() => {
     calculate(form.getValues());
-  }, []);
+  }, [currency]);
 
   const calculate = (values: FormData) => {
     const { principal, rate, tenure, compoundingFrequency, monthlyContribution } = values;
@@ -125,6 +129,8 @@ export function CompoundInterestCalculator() {
     });
   };
 
+  const CurrencyIcon = currency === 'INR' ? IndianRupee : 'span';
+
   return (
     <div className="space-y-8">
       <Card className="overflow-hidden shadow-lg">
@@ -144,7 +150,7 @@ export function CompoundInterestCalculator() {
                   name="principal"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center gap-2"><IndianRupee className="h-4 w-4"/>Principal Amount</FormLabel>
+                      <FormLabel className="flex items-center gap-2"><CurrencyIcon className="h-4 w-4"/>Principal Amount</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g., 100,000" {...field} type="number" />
                       </FormControl>
@@ -233,7 +239,7 @@ export function CompoundInterestCalculator() {
                         <CardTitle className="text-lg">Total Amount</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-3xl font-bold text-primary">{formatNumber(result.totalAmount, { style: 'currency', currency: 'INR' })}</p>
+                        <p className="text-3xl font-bold text-primary">{formatNumber(result.totalAmount, { style: 'currency', currency: currency })}</p>
                     </CardContent>
                 </Card>
                  <Card>
@@ -241,7 +247,7 @@ export function CompoundInterestCalculator() {
                         <CardTitle className="text-lg">Total Contributions</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-3xl font-bold">{formatNumber(result.totalContributions, { style: 'currency', currency: 'INR' })}</p>
+                        <p className="text-3xl font-bold">{formatNumber(result.totalContributions, { style: 'currency', currency: currency })}</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -249,7 +255,7 @@ export function CompoundInterestCalculator() {
                         <CardTitle className="text-lg">Total Interest Earned</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-3xl font-bold">{formatNumber(result.totalInterest, { style: 'currency', currency: 'INR' })}</p>
+                        <p className="text-3xl font-bold">{formatNumber(result.totalInterest, { style: 'currency', currency: currency })}</p>
                     </CardContent>
                 </Card>
             </div>
@@ -267,9 +273,15 @@ export function CompoundInterestCalculator() {
                         axisLine={false}
                         tickLine={false}
                         tickMargin={10}
-                        tickFormatter={(value) => formatNumber(value, {notation: 'compact', compactDisplay: 'short'})}
+                        tickFormatter={(value) => formatNumber(value, {notation: 'compact', compactDisplay: 'short', style: 'currency', currency: currency})}
                       />
-                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <ChartTooltip content={<ChartTooltipContent formatter={(value, name, props) => {
+                          return (
+                            <div className="flex flex-col">
+                              <span>{formatNumber(Number(value), {style: 'currency', currency: currency})}</span>
+                            </div>
+                          )
+                        }} />} />
                       <Legend />
                       <Bar dataKey="principal" stackId="a" fill="var(--color-principal)" radius={[0, 0, 4, 4]} />
                       <Bar dataKey="contribution" stackId="a" fill="var(--color-contribution)" radius={[0, 0, 4, 4]} />

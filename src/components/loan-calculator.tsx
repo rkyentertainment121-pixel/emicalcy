@@ -77,7 +77,11 @@ type SummaryData = {
   totalPaidWithPrepayment: number;
 };
 
-export function LoanCalculator() {
+type LoanCalculatorProps = {
+  currency: string;
+};
+
+export function LoanCalculator({ currency }: LoanCalculatorProps) {
   const [amortizationData, setAmortizationData] = useState<AmortizationData[] | null>(null);
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [aiSuggestion, setAiSuggestion] = useState<PrepaymentSuggestionsOutput | null>(null);
@@ -105,7 +109,7 @@ export function LoanCalculator() {
   
   useEffect(() => {
     calculate(form.getValues());
-  }, []);
+  }, [currency]);
 
   const calculate = (values: z.infer<typeof formSchema>) => {
     const principal = values.loanAmount + (values.processingFee || 0);
@@ -242,6 +246,9 @@ export function LoanCalculator() {
     personal: <User className="h-4 w-4" />,
   };
 
+  const CurrencyIcon = currency === 'INR' ? IndianRupee : 'span';
+
+
   return (
     <div className="space-y-8">
       <Card className="overflow-hidden shadow-lg">
@@ -261,7 +268,7 @@ export function LoanCalculator() {
                   name="loanAmount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center gap-2"><IndianRupee className="h-4 w-4"/>Loan Amount</FormLabel>
+                      <FormLabel className="flex items-center gap-2"><CurrencyIcon className="h-4 w-4"/>Loan Amount</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g., 1,000,000" {...field} type="number" />
                       </FormControl>
@@ -406,7 +413,7 @@ export function LoanCalculator() {
                   <CardTitle className="text-lg">Monthly Payment (EMI)</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-bold text-primary">{formatNumber(summary.emi, { style: 'currency', currency: 'INR' })}</p>
+                  <p className="text-3xl font-bold text-primary">{formatNumber(summary.emi, { style: 'currency', currency: currency })}</p>
                 </CardContent>
               </Card>
               <Card>
@@ -414,7 +421,7 @@ export function LoanCalculator() {
                   <CardTitle className="text-lg">Total Interest</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-bold">{formatNumber(summary.totalInterest, { style: 'currency', currency: 'INR' })}</p>
+                  <p className="text-3xl font-bold">{formatNumber(summary.totalInterest, { style: 'currency', currency: currency })}</p>
                 </CardContent>
               </Card>
               <Card>
@@ -422,7 +429,7 @@ export function LoanCalculator() {
                   <CardTitle className="text-lg">Total Payment</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-bold">{formatNumber(summary.totalPaidWithPrepayment, { style: 'currency', currency: 'INR' })}</p>
+                  <p className="text-3xl font-bold">{formatNumber(summary.totalPaidWithPrepayment, { style: 'currency', currency: currency })}</p>
                 </CardContent>
               </Card>
               <Card>
@@ -439,7 +446,7 @@ export function LoanCalculator() {
                   <CardTitle className="text-lg">Interest Saved</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-bold text-green-600">{formatNumber(summary.interestSaved, { style: 'currency', currency: 'INR' })}</p>
+                  <p className="text-3xl font-bold text-green-600">{formatNumber(summary.interestSaved, { style: 'currency', currency: currency })}</p>
                 </CardContent>
               </Card>
               <Card>
@@ -476,10 +483,10 @@ export function LoanCalculator() {
                       {amortizationData.map((row) => (
                         <TableRow key={row.month}>
                           <TableCell className="font-medium">{row.month}</TableCell>
-                          <TableCell>{formatNumber(row.payment, { style: 'currency', currency: 'INR' })}</TableCell>
-                          <TableCell>{formatNumber(row.principal, { style: 'currency', currency: 'INR' })}</TableCell>
-                          <TableCell>{formatNumber(row.interest, { style: 'currency', currency: 'INR' })}</TableCell>
-                          <TableCell className="text-right">{formatNumber(row.remainingBalance, { style: 'currency', currency: 'INR' })}</TableCell>
+                          <TableCell>{formatNumber(row.payment, { style: 'currency', currency: currency })}</TableCell>
+                          <TableCell>{formatNumber(row.principal, { style: 'currency', currency: currency })}</TableCell>
+                          <TableCell>{formatNumber(row.interest, { style: 'currency', currency: currency })}</TableCell>
+                          <TableCell className="text-right">{formatNumber(row.remainingBalance, { style: 'currency', currency: currency })}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -559,7 +566,7 @@ export function LoanCalculator() {
                                <p className="font-semibold">{aiSuggestion.suggestedStrategy}</p>
                                <p>{aiSuggestion.reasoning}</p>
                                <div className="flex justify-between text-sm mt-2 pt-2 border-t">
-                                <span>Interest Saved: <span className="font-bold text-green-600">{formatNumber(aiSuggestion.estimatedInterestSavings, {style: 'currency', currency: 'INR'})}</span></span>
+                                <span>Interest Saved: <span className="font-bold text-green-600">{formatNumber(aiSuggestion.estimatedInterestSavings, {style: 'currency', currency: currency})}</span></span>
                                 <span>Tenure Reduction: <span className="font-bold text-green-600">{aiSuggestion.estimatedTenureReductionMonths} months</span></span>
                                </div>
                             </AlertDescription>

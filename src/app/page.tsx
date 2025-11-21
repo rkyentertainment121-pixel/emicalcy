@@ -1,10 +1,22 @@
 
+"use client";
+
+import { useState } from "react";
 import { LoanCalculator } from "@/components/loan-calculator";
 import { CompoundInterestCalculator } from "@/components/compound-interest-calculator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PiggyBank, Landmark, Percent } from "lucide-react";
+import { PiggyBank, Landmark, Percent, CircleDollarSign } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Home() {
+  const [currency, setCurrency] = useState("INR");
+
   return (
     <main className="min-h-screen w-full font-body">
       <div className="container mx-auto px-4 py-8 md:py-12">
@@ -19,6 +31,24 @@ export default function Home() {
             Your all-in-one suite for smart financial planning. Make informed decisions about your loans, investments, and savings.
           </p>
         </header>
+
+        <div className="flex justify-center mb-6">
+          <div className="w-full max-w-xs">
+             <label htmlFor="currency-selector" className="flex items-center gap-2 mb-2 text-sm font-medium text-muted-foreground justify-center">
+              <CircleDollarSign className="h-4 w-4"/> Select Currency
+            </label>
+            <Select value={currency} onValueChange={setCurrency}>
+              <SelectTrigger id="currency-selector" className="w-full">
+                <SelectValue placeholder="Select currency" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="INR">Indian Rupee (INR)</SelectItem>
+                <SelectItem value="USD">US Dollar (USD)</SelectItem>
+                <SelectItem value="EUR">Euro (EUR)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         
         <Tabs defaultValue="emi-calculator" className="w-full">
           <TabsList className="grid w-full grid-cols-2 max-w-lg mx-auto">
@@ -32,10 +62,10 @@ export default function Home() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="emi-calculator" className="mt-6">
-            <LoanCalculator />
+            <LoanCalculator currency={currency} />
           </TabsContent>
           <TabsContent value="compound-interest-calculator" className="mt-6">
-            <CompoundInterestCalculator />
+            <CompoundInterestCalculator currency={currency} />
           </TabsContent>
         </Tabs>
       </div>

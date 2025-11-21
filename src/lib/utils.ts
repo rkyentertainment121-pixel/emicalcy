@@ -15,7 +15,7 @@ export function formatNumber(
     ...options,
   };
   
-  return new Intl.NumberFormat("en-IN", defaultOptions).format(value);
+  const locale = options.currency === 'INR' ? 'en-IN' : 'en-US';
+  
+  return new Intl.NumberFormat(locale, defaultOptions).format(value);
 }
-
-    
