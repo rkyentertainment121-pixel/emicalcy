@@ -77,9 +77,6 @@ export function CompoundInterestCalculator({ currency }: CompoundInterestCalcula
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      principal: 100000,
-      rate: 10,
-      tenure: 10,
       compoundingFrequency: 1,
       monthlyContribution: 0,
     },
@@ -90,7 +87,12 @@ export function CompoundInterestCalculator({ currency }: CompoundInterestCalcula
   };
   
   useEffect(() => {
-    calculate(form.getValues());
+    const values = form.getValues();
+    if(values.principal && values.rate && values.tenure){
+      calculate(form.getValues());
+    } else {
+        setResult(null);
+    }
   }, [currency]);
 
   const calculate = (values: FormData) => {
@@ -158,7 +160,10 @@ export function CompoundInterestCalculator({ currency }: CompoundInterestCalcula
                     <FormItem>
                       <FormLabel className="flex items-center gap-2"><span className="text-muted-foreground">{currencySymbol}</span>Principal Amount</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., 100,000" {...field} type="number" />
+                        <Input placeholder="e.g., 100,000" {...field} type="number" onChange={(e) => {
+                            field.onChange(e.target.value);
+                            setResult(null);
+                        }}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -171,7 +176,10 @@ export function CompoundInterestCalculator({ currency }: CompoundInterestCalcula
                     <FormItem>
                       <FormLabel className="flex items-center gap-2"><Percent className="h-4 w-4"/>Annual Interest Rate (%)</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., 10" {...field} type="number" step="0.01" />
+                        <Input placeholder="e.g., 10" {...field} type="number" step="0.01" onChange={(e) => {
+                            field.onChange(e.target.value);
+                            setResult(null);
+                        }}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -184,7 +192,10 @@ export function CompoundInterestCalculator({ currency }: CompoundInterestCalcula
                     <FormItem>
                       <FormLabel className="flex items-center gap-2"><CalendarClock className="h-4 w-4"/>Time Period (Years)</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., 10" {...field} type="number" />
+                        <Input placeholder="e.g., 10" {...field} type="number" onChange={(e) => {
+                            field.onChange(e.target.value);
+                            setResult(null);
+                        }}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

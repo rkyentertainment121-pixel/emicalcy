@@ -97,11 +97,8 @@ export function LoanCalculator({ currency }: LoanCalculatorProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      loanAmount: 1000000,
-      interestRate: 8.5,
-      tenure: 20,
       loanType: "home",
-      processingFee: 10000,
+      processingFee: 0,
       lumpSumAmount: 0,
       extraMonthlyPayment: 0,
       financialGoals: "Pay off loan quickly",
@@ -114,7 +111,13 @@ export function LoanCalculator({ currency }: LoanCalculatorProps) {
   };
   
   useEffect(() => {
-    calculate(form.getValues());
+    const values = form.getValues();
+    if(values.loanAmount && values.interestRate && values.tenure){
+      calculate(form.getValues());
+    } else {
+        setAmortizationData(null);
+        setSummary(null);
+    }
   }, [currency]);
 
   const calculate = (values: z.infer<typeof formSchema>) => {
@@ -276,7 +279,11 @@ export function LoanCalculator({ currency }: LoanCalculatorProps) {
                     <FormItem>
                       <FormLabel className="flex items-center gap-2"><span className="text-muted-foreground">{currencySymbol}</span>Loan Amount</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., 1,000,000" {...field} type="number" />
+                        <Input placeholder="e.g., 1,000,000" {...field} type="number" onChange={(e) => {
+                            field.onChange(e.target.value);
+                            setSummary(null);
+                            setAmortizationData(null);
+                        }}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -289,7 +296,11 @@ export function LoanCalculator({ currency }: LoanCalculatorProps) {
                     <FormItem>
                       <FormLabel className="flex items-center gap-2"><Percent className="h-4 w-4"/>Annual Interest Rate (%)</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., 8.5" {...field} type="number" step="0.01" />
+                        <Input placeholder="e.g., 8.5" {...field} type="number" step="0.01" onChange={(e) => {
+                            field.onChange(e.target.value);
+                            setSummary(null);
+                            setAmortizationData(null);
+                        }}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -302,7 +313,11 @@ export function LoanCalculator({ currency }: LoanCalculatorProps) {
                     <FormItem>
                       <FormLabel className="flex items-center gap-2"><CalendarClock className="h-4 w-4"/>Loan Tenure (Years)</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., 20" {...field} type="number" />
+                        <Input placeholder="e.g., 20" {...field} type="number" onChange={(e) => {
+                            field.onChange(e.target.value);
+                            setSummary(null);
+                            setAmortizationData(null);
+                        }}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
